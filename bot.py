@@ -8,14 +8,15 @@ import json
 from dotenv import load_dotenv
 import aiosqlite
 import uuid
-from aiogram import Bot, Dispatcher, F
-from aiogram.types import Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, LabeledPrice, PreCheckoutQuery, SuccessfulPayment  # ← Update!
+from aiogram import Bot, Dispatcher, types, F  # ← types!
+from aiogram.types import Update, InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, LabeledPrice, PreCheckoutQuery, SuccessfulPayment
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
 from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.filters import CommandStart, Command
 import uvicorn
 from fastapi import FastAPI, Request
+
 
 
 load_dotenv()
@@ -582,7 +583,7 @@ async def main():
     await init_db()
 
     # Устанавливаем webhook для Render
-    webhook_url = f"https://alposty-bot-12.onrender.com/webhook"
+    webhook_url = f"https://alposty-bot-10.onrender.com/webhook"
     await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(webhook_url)
     print(f"✅ Webhook установлен: {webhook_url}")
