@@ -579,7 +579,7 @@ async def main():
     await init_db()
 
     # Устанавливаем webhook для Render
-    webhook_url = f"https://alposty-bot-7.onrender.com/webhook"
+    webhook_url = f"https://alposty-bot-10.onrender.com/webhook"
     await bot.delete_webhook(drop_pending_updates=True)
     await bot.set_webhook(webhook_url)
     print(f"✅ Webhook установлен: {webhook_url}")
