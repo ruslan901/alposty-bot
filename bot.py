@@ -1,5 +1,7 @@
 import ssl
-ssl._create_default_https_context = ssl._create_unverified_context  # ← SSL OFF!
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
+ssl._create_default_https_context = ssl._create_unverified_context
 
 import asyncio
 import logging
@@ -246,10 +248,11 @@ async def use_limit(user_id: int, service: str):
         if service == "posts":
             await db.execute('UPDATE users SET posts_free = MAX(0, COALESCE(posts_free, 3) - 1) WHERE user_id = ?',
                              (user_id,))
-        else:
-            await db.execute('UPDATE users SET law_free = GREATEST(0, COALESCE(law_free, 3) - 1) WHERE user_id = ?',
+        else:  # ЮРИСТ - SQLite НЕ понимает GREATEST!
+            await db.execute('UPDATE users SET law_free = MAX(0, COALESCE(law_free, 3) - 1) WHERE user_id = ?',
                              (user_id,))
         await db.commit()
+
 
 
 # ✅ ОБРАБОТЧИК ТЕКСТА
