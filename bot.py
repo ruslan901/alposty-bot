@@ -36,11 +36,14 @@ app = FastAPI()
 
 @app.post("/webhook")
 async def webhook(request: Request):
-    """Telegram webhook endpoint"""
-    json_string = await request.body()
-    update = json.loads(json_string)
-    await dp.feed_update(bot, update)
-    return {"ok": True}
+    try:
+        # JSON → Update объект!
+        update = Update(**await request.json())
+        await dp.feed_update(bot, update)
+        return {"status": "ok"}
+    except Exception as e:
+        print(f"Webhook error: {e}")
+        return {"status": "error"}
 
 @app.get("/")
 async def root():
