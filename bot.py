@@ -15,6 +15,8 @@ from aiogram.fsm.storage.memory import MemoryStorage
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery, LabeledPrice, PreCheckoutQuery, \
     SuccessfulPayment
 from aiogram.filters import CommandStart, Command
+import uvicorn
+from fastapi import FastAPI
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
@@ -29,6 +31,17 @@ DB_PATH = 'users.db'
 
 bot = Bot(token=BOT_TOKEN)
 dp = Dispatcher(storage=MemoryStorage())
+
+app = FastAPI()
+
+@app.get("/")
+async def root():
+    return {"status": "GigaChat Bot @my_alpost_bot Live 24/7!"}
+
+@app.get("/health")
+async def health():
+    return {"status": "healthy", "bot": "@my_alpost_bot"}
+
 
 
 class UserState(StatesGroup):
@@ -557,11 +570,20 @@ async def unknown_callback(callback: CallbackQuery):
 async def main():
     await init_db()
     print("🚀 GigaChat Бот запущен!")
-    await dp.start_polling(bot)
+
+    # Render Free: Polling + Web сервер
+    polling_task = asyncio.create_task(dp.start_polling(bot))
+
+    port = int(os.getenv("PORT", 10000))
+    config = uvicorn.Config(app, host="0.0.0.0", port=port, log_level="info")
+    server = uvicorn.Server(config)
+
+    await asyncio.gather(polling_task, server.serve())
 
 
 if __name__ == '__main__':
     asyncio.run(main())
+
 
 
 
