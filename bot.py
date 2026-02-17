@@ -571,14 +571,11 @@ async def main():
     await init_db()
     print("🚀 GigaChat Бот запущен!")
 
-    # Render Free: Polling + Web сервер
-    polling_task = asyncio.create_task(dp.start_polling(bot))
-
+    # Render Free: FastAPI + Aiogram Webhook
     port = int(os.getenv("PORT", 10000))
     config = uvicorn.Config(app, host="0.0.0.0", port=port, log_level="info")
     server = uvicorn.Server(config)
-
-    await asyncio.gather(polling_task, server.serve())
+    await server.serve()
 
 
 if __name__ == '__main__':
