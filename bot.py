@@ -16,7 +16,7 @@ from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQu
     SuccessfulPayment
 from aiogram.filters import CommandStart, Command
 import uvicorn
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 
 load_dotenv()
 logging.basicConfig(level=logging.INFO)
