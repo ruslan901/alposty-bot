@@ -216,7 +216,7 @@ async def use_limit(user_id: int, service: str):
         return
     async with aiosqlite.connect(DB_PATH) as db:
         if service == "posts":
-            await db.execute('UPDATE users SET posts_free = GREATEST(0, COALESCE(posts_free, 3) - 1) WHERE user_id = ?',
+            await db.execute('UPDATE users SET posts_free = MAX(0, COALESCE(posts_free, 3) - 1) WHERE user_id = ?',
                              (user_id,))
         else:
             await db.execute('UPDATE users SET law_free = GREATEST(0, COALESCE(law_free, 3) - 1) WHERE user_id = ?',
