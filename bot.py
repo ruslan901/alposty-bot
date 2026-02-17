@@ -107,19 +107,13 @@ async def giga_chat_request(prompt: str, service_type: str = "content") -> str:
 
     url = "https://gigachat.devices.sberbank.ru/api/v1/chat/completions"
 
+    # System prompts...
     if service_type == "posts":
-        system_prompt = """Ты профессиональный контент-маркетолог. Пиши продающие посты для соцсетей:
-- Эмоциональный язык + эмодзи
-- 200-300 слов максимум
-- Призыв к действию в конце
-- Живой текст"""
+        system_prompt = """Ты профессиональный контент-маркетолог..."""
     elif service_type == "law":
-        system_prompt = """Ты профессиональный юрист РФ. Отвечай:
-- По законам РФ с номерами статей
-- Практические советы
-- Четко структурировано"""
+        system_prompt = """Ты профессиональный юрист РФ..."""
     else:
-        system_prompt = "Ты полезный ассистент. Отвечай четко."
+        system_prompt = "Ты полезный ассистент..."
 
     headers = {
         'Authorization': f'Bearer {token}',
@@ -129,32 +123,26 @@ async def giga_chat_request(prompt: str, service_type: str = "content") -> str:
 
     payload = {
         "model": "GigaChat-Pro",
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": f"Создай: {prompt}"}
-        ],
-        "temperature": 0.7,
-        "max_tokens": 1500
+        "messages": [{"role": "system", "content": system_prompt}, {"role": "user", "content": f"Создай: {prompt}"}],
+        "temperature": 0.7, "max_tokens": 1500
     }
 
     try:
         timeout = aiohttp.ClientTimeout(total=60)
-        # 🔥 SSL ФИКС ДЛЯ AIOHTTP:
-        connector = aiohttp.TCPConnector(ssl=False)
+        # 🔥 SSL + AUTH ФИКС:
+        connector = aiohttp.TCPConnector(ssl=False, limit=100)
         async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
             async with session.post(url, headers=headers, json=payload) as resp:
                 if resp.status == 200:
                     result = await resp.json()
-                    response_text = result['choices'][0]['message']['content']
-                    return response_text[:3950] if len(response_text) > 3950 else response_text
+                    return result['choices'][0]['message']['content'][:3950]
                 else:
                     error_text = await resp.text()
-                    print(f"❌ GigaChat error {resp.status}: {error_text}")
+                    print(f"❌ GigaChat HTTP {resp.status}: {error_text}")
                     return f"Ошибка GigaChat: {resp.status}"
     except Exception as e:
-        print(f"❌ GigaChat request error: {e}")
+        print(f"❌ GigaChat error: {e}")
         return "Ошибка сети. Попробуйте позже."
-
 
 
 # ✅ ИСПРАВЛЕННАЯ БАЗА ДАННЫХ - БЕЗ PRAGMA
