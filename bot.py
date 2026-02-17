@@ -34,6 +34,14 @@ dp = Dispatcher(storage=MemoryStorage())
 
 app = FastAPI()
 
+@app.post("/webhook")
+async def webhook(request: Request):
+    """Telegram webhook endpoint"""
+    json_string = await request.body()
+    update = json.loads(json_string)
+    await dp.feed_update(bot, update)
+    return {"ok": True}
+
 @app.get("/")
 async def root():
     return {"status": "GigaChat Bot @my_alpost_bot Live 24/7!"}
@@ -569,15 +577,23 @@ async def unknown_callback(callback: CallbackQuery):
 
 async def main():
     await init_db()
-    print("🚀 GigaChat Бот запущен!")
 
-    # Render Free: FastAPI + Aiogram Webhook
+    # Устанавливаем webhook для Render
+    webhook_url = f"https://alposty-bot-7.onrender.com/webhook"
+    await bot.delete_webhook(drop_pending_updates=True)
+    await bot.set_webhook(webhook_url)
+    print(f"✅ Webhook установлен: {webhook_url}")
+
+    print("🚀 GigaChat Бот запущен на WEBHOOK!")
+
+    # FastAPI сервер
     port = int(os.getenv("PORT", 10000))
     config = uvicorn.Config(app, host="0.0.0.0", port=port, log_level="info")
     server = uvicorn.Server(config)
     await server.serve()
 
 
+# НЕ МЕНЯЙ if __name__:
 if __name__ == '__main__':
     asyncio.run(main())
 
