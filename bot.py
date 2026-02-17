@@ -139,7 +139,9 @@ async def giga_chat_request(prompt: str, service_type: str = "content") -> str:
 
     try:
         timeout = aiohttp.ClientTimeout(total=60)
-        async with aiohttp.ClientSession(timeout=timeout) as session:
+        # 🔥 SSL ФИКС ДЛЯ AIOHTTP:
+        connector = aiohttp.TCPConnector(ssl=False)
+        async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
             async with session.post(url, headers=headers, json=payload) as resp:
                 if resp.status == 200:
                     result = await resp.json()
@@ -152,6 +154,7 @@ async def giga_chat_request(prompt: str, service_type: str = "content") -> str:
     except Exception as e:
         print(f"❌ GigaChat request error: {e}")
         return "Ошибка сети. Попробуйте позже."
+
 
 
 # ✅ ИСПРАВЛЕННАЯ БАЗА ДАННЫХ - БЕЗ PRAGMA
