@@ -585,6 +585,15 @@ async def main():
     await bot.set_webhook(webhook_url)
     print(f"✅ Webhook установлен: {webhook_url}")
 
+    # 🔥 ЭТО РЕШАЕТ ВСЮ ПРОБЛЕМУ BotFather:
+    from aiogram.types import BotCommand
+    commands = [
+        BotCommand(command="start", description="Главное меню"),
+        BotCommand(command="balance", description="Мой баланс")
+    ]
+    await bot.set_my_commands(commands)
+    print("✅ Команды установлены!")
+
     print("🚀 GigaChat Бот запущен на WEBHOOK!")
 
     # FastAPI сервер
