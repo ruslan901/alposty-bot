@@ -83,7 +83,9 @@ class GigaChatAuth:
 
         try:
             timeout = aiohttp.ClientTimeout(total=30)
-            async with aiohttp.ClientSession(timeout=timeout) as session:
+            # 🔥 SSL ФИКС ДЛЯ AUTH!
+            connector = aiohttp.TCPConnector(ssl=False, limit=100)
+            async with aiohttp.ClientSession(timeout=timeout, connector=connector) as session:
                 async with session.post(url, headers=headers, data=data) as resp:
                     if resp.status == 200:
                         result = await resp.json()
