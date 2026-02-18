@@ -307,6 +307,55 @@ async def welcome_full_screen(message: types.Message):
         await message.answer("🔥 ТЕСТЕР ✓ БЕЗЛИМИТ GigaChat РАБОТАЕТ!", parse_mode="Markdown")
 
 
+@dp.message(Command("stats"))
+async def stats_command(message: types.Message):
+    # ТОЛЬКО ДЛЯ ТЕБЯ!
+    if message.from_user.id != 854258933:
+        await message.answer("❌ Доступ только владельцу бота!")
+        return
+
+    today = datetime.now().strftime('%Y-%m-%d')
+
+    async with aiosqlite.connect(DB_PATH) as db:
+        # Все пользователи
+        cursor = await db.execute('SELECT COUNT(*) FROM users')
+        total_users = (await cursor.fetchone())[0]
+
+        # Платящие (Stars активны сегодня)
+        cursor = await db.execute('SELECT COUNT(*) FROM users WHERE stars_end_date > ?', (today,))
+        paying_users = (await cursor.fetchone())[0]
+
+        # Актив сегодня
+        cursor = await db.execute('SELECT COUNT(*) FROM users WHERE last_reset = ?', (today,))
+        active_today = (await cursor.fetchone())[0]
+
+        # Stars всего продано (примерно)
+        cursor = await db.execute('SELECT COUNT(*) FROM users WHERE stars_end_date IS NOT NULL')
+        total_buyers = (await cursor.fetchone())[0]
+        total_stars = total_buyers * 150  # средняя покупка
+        revenue = total_buyers * 100  # 150⭐ = 100₽ чистыми
+
+    stats_text = f"""
+📊 **СТАТИСТИКА БОТА** 🔥
+
+👥 Всего пользователей: `{total_users}`
+⭐ Платящих юзеров: `{paying_users}`
+📈 Актив сегодня: `{active_today}`
+💎 Всего Stars продано: `{total_stars}`
+💰 **ДОХОД: `{revenue}₽** 
+
+🎁 Бесплатных запросов: `{active_today * 3}`
+🔄 Общий оборот Stars: `{total_stars * 0.7}₽`
+"""
+
+    kb = InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton(text="📢 Канал", url="https://t.me/alposty_chat")],
+        [InlineKeyboardButton(text="🏠 Меню", callback_data="main_menu")]
+    ])
+
+    await message.answer(stats_text, reply_markup=kb, parse_mode="Markdown")
+
+
 # 📝 МЕНЮ ПОСТОВ
 @dp.callback_query(F.data == "service_posts")
 async def content_menu(callback: CallbackQuery):
