@@ -336,24 +336,24 @@ async def stats_command(message: types.Message):
         revenue = total_buyers * 100  # 150⭐ = 100₽ чистыми
 
     stats_text = f"""
-📊 **СТАТИСТИКА БОТА** 🔥
+    📊 СТАТИСТИКА БОТА 🔥
 
-👥 Всего пользователей: `{total_users}`
-⭐ Платящих юзеров: `{paying_users}`
-📈 Актив сегодня: `{active_today}`
-💎 Всего Stars продано: `{total_stars}`
-💰 **ДОХОД: `{revenue}₽** 
+    👥 Всего пользователей: {total_users}
+    ⭐ Платящих юзеров: {paying_users}
+    📈 Актив сегодня: {active_today}
+    💎 Всего Stars продано: {total_stars}
+    💰 ДОХОД: {revenue}₽
 
-🎁 Бесплатных запросов: `{active_today * 3}`
-🔄 Общий оборот Stars: `{total_stars * 0.7}₽`
-"""
+    🎁 Бесплатных запросов: {active_today * 3}
+    🔄 Общий оборот Stars: {total_stars * 0.7:.0f}₽
+    """
 
     kb = InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="📢 Канал", url="https://t.me/alposty_chat")],
         [InlineKeyboardButton(text="🏠 Меню", callback_data="main_menu")]
     ])
 
-    await message.answer(stats_text, reply_markup=kb, parse_mode="Markdown")
+    await message.answer(stats_text, reply_markup=kb)  # УБЕРИ parse_mode!
 
 
 # 📝 МЕНЮ ПОСТОВ
